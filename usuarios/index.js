@@ -8,6 +8,12 @@ let idUsuario = 0
 //endpoint para cadastrar um novo usuario paciente
 //localhost:5000/cadastro/paciente
 app.post('/cadastro/paciente', (req, res) => {
+
+    usuarios.forEach(usuario =>{
+        if(usuario.cpf === req.body.cpf){
+            return res.send("CPF já cadastrado.")
+        }
+    })    
     idUsuario++
     const usuario = req.body
     usuarios.push({

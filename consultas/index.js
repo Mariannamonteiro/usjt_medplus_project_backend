@@ -1,6 +1,7 @@
 const express = require('express')
 const app = express()
 app.use(express.json())
+const axios = require('axios');
 
 const consultas = []
 let idConsulta= 0
@@ -53,7 +54,7 @@ app.delete('/consulta/cancelar/:idConsulta', (req, res)=>{
 
 //endpoint para marcar uma nova consulta 
 //localhost:6000/consulta/agendar
-app.post('/consulta/agendar', (req, res) => {
+app.post('/consulta/agendar', async (req, res) => {
     idConsulta++
     const consulta = req.body
     consultas.push({
@@ -64,7 +65,13 @@ app.post('/consulta/agendar', (req, res) => {
         dataConsulta: consulta.dataConsulta,       
         idEspecialidade: consulta.idEspecialidade, 
         unidade: consulta.unidade
-    })
+    });
+    await axios.post("http://localhost:7000/eventos", {
+    tipo: "ConsultaAgendada",
+    dados: {
+        consulta
+    }
+  });
 
     res.status(201).send(`Consulta para o dia ${consulta.dataConsulta} agendada com sucesso!`)
 

@@ -2,6 +2,28 @@ const express = require('express')
 const app = express()
 app.use(express.json())
 const axios = require('axios');
+require('dotenv').config()
+
+const {
+    USER_DB,
+    HOST_DB,
+    DATABASE_DB,
+    PASSWORD_DB,
+    PORT_DB} = process.env
+    const {
+        Client
+      } = require('pg')
+     
+      function obterConexaoDB (){
+        return new Client({
+          user: USER_DB,
+          host: HOST_DB,
+          database: DATABASE_DB,
+          password: PASSWORD_DB,
+          port: PORT_DB
+        });
+      }
+
 
 const consultas = []
 let idConsulta= 0
@@ -34,8 +56,14 @@ app.put('/consulta/reagendamento/:idConsulta',(req,res)=>{
 
 //endpoint para listar todas as consultas
 //localhost:6000/consultas
-app.get('/consultas', (req, res)=> {
-    res.send(consultas);
+app.get('/consultas', async (req, res)=> {
+    let db = obterConexaoDB()
+    db.connect()
+    const { rows } = await db.query
+    ("SELECT * FROM tb_consultas")
+    console.log(rows)
+    await db.end()
+    res.json(rows);
 })
 
 //endpoint para cancelar consulta

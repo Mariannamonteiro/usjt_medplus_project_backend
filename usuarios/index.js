@@ -2,18 +2,50 @@ const express = require('express')
 const app = express()
 app.use(express.json())
 
+require('dotenv').config()
+
+const {
+    USER_DB,
+    HOST_DB,
+    DATABASE_DB,
+    PASSWORD_DB,
+    PORT_DB} = process.env
+    const {
+        Client
+      } = require('pg')
+     
+      function obterConexaoDB (){
+        return new Client({
+          user: USER_DB,
+          host: HOST_DB,
+          database: DATABASE_DB,
+          password: PASSWORD_DB,
+          port: PORT_DB
+        });
+      }
+
+
+
 const usuarios = []
 let idUsuario = 0
 
 //endpoint para cadastrar um novo usuario paciente
 //localhost:5000/cadastro/paciente
-app.post('/cadastro/paciente', (req, res) => {
+app.post('/cadastro/paciente',async (req, res) => {
 
-    usuarios.forEach(usuario =>{
-        if(usuario.cpf === req.body.cpf){
+    let db = obterConexaoDB()
+    db.connect()
+    const { pacientes } = await db.query
+    ("SELECT * FROM TB_PACIENTES")
+    pacientes.forEach(paciente =>{
+
+        if(paciente.cpf === req.body.cpf){
             return res.send("CPF já cadastrado.")
         }
-    })    
+    })   
+
+   
+    
     idUsuario++
     const usuario = req.body
     usuarios.push({

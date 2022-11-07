@@ -5,22 +5,22 @@ app.use(express.json())
 require('dotenv').config()
 
 const {
-    USER_DB,
-    HOST_DB,
-    DATABASE_DB,
-    PASSWORD_DB,
-    PORT_DB} = process.env
+    USER_DB_USUARIOS,
+    HOST_DB_USUARIOS,
+    DATABASE_DB_USUARIOS,
+    PASSWORD_DB_USUARIOS,
+    PORT_DB_USUARIOS} = process.env
     const {
         Client
       } = require('pg')
      
       function obterConexaoDB (){
         return new Client({
-          user: USER_DB,
-          host: HOST_DB,
-          database: DATABASE_DB,
-          password: PASSWORD_DB,
-          port: PORT_DB
+          user: USER_DB_USUARIOS,
+          host: HOST_DB_USUARIOS,
+          database: DATABASE_DB_USUARIOS,
+          password: PASSWORD_DB_USUARIOS,
+          port: PORT_DB_USUARIOS
         });
       }
 

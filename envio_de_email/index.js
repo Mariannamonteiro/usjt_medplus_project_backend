@@ -12,6 +12,7 @@ const {
     EMAIL_PASS} = process.env
 
 
+
 app.post('/envio-de-email', (req, res) => {
 
     const consulta = req.body.dados.consulta
@@ -26,12 +27,12 @@ app.post('/envio-de-email', (req, res) => {
             pass: EMAIL_PASS
         }
     });
+    
 
     transporter.sendMail({
         from: `USJT MEDPLUS <${EMAIL_USER}>`,
         to: consulta.email,
         subject: "MEDPLUS - Consulta Agendada",
-        text:`Olá ${consulta.nome}, sua consulta f`,
         html: `Olá ${consulta.nome}, <br> sua consulta foi marcada com sucesso na MEDPLUS, confira: <br>
         Dia: ${consulta.dataConsulta} <br>
         Unidade: ${consulta.unidade}  <br>

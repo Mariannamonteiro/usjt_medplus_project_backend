@@ -5,22 +5,22 @@ const axios = require('axios');
 require('dotenv').config()
 
 const {
-    USER_DB,
-    HOST_DB,
-    DATABASE_DB,
-    PASSWORD_DB,
-    PORT_DB} = process.env
+    USER_DB_CONSULTA,
+    HOST_DB_CONSULTA,
+    DATABASE_DB_CONSULTA,
+    PASSWORD_DB_CONSULTA,
+    PORT_DB_CONSULTA} = process.env
     const {
         Client
       } = require('pg')
      
       function obterConexaoDB (){
         return new Client({
-          user: USER_DB,
-          host: HOST_DB,
-          database: DATABASE_DB,
-          password: PASSWORD_DB,
-          port: PORT_DB
+          user: USER_DB_CONSULTA,
+          host: HOST_DB_CONSULTA,
+          database: DATABASE_DB_CONSULTA,
+          password: PASSWORD_DB_CONSULTA,
+          port: PORT_DB_CONSULTA
         });
       }
 
@@ -38,6 +38,7 @@ app.get('/consulta/:idConsulta', (req, res) => {
         }
     })
 })
+
 
 //Endpoint para reagendar dados de uma consulta
 //localhost:6000/consulta/reagendamento/:idConsulta
@@ -83,17 +84,24 @@ app.delete('/consulta/cancelar/:idConsulta', (req, res)=>{
 //endpoint para marcar uma nova consulta 
 //localhost:6000/consulta/agendar
 app.post('/consulta/agendar', async (req, res) => {
-    idConsulta++
+    //abrir conexao com o banco 
+    let db = obterConexaoDB()
+    db.connect()
+
+    let rows = db.query('SELECT MAX(cons_id) FROM tb_consultas')
+    console.log(rows[0])
+
+    idConsulta = rows++
     const consulta = req.body
-    consultas.push({
-        idConsulta: idConsulta,
-        nome: consulta.nome,
-        cpf: consulta.cpf,
-        email: consulta.email,
-        dataConsulta: consulta.dataConsulta,       
-        idEspecialidade: consulta.idEspecialidade, 
-        unidade: consulta.unidade
-    });
+
+    const sqlQuery = "INSERT INTO TB_CONSULTAS (CONS_ID, CONS_IDESPECIALIDADE, CONS_IDUNIDADE, CONS_IDPACIENTE, CONS_DTHR) VALUES ($1,$2,$3,$4,$5)"
+    const result = db.query(sqlQuery, [8, consulta.idEspecialidade, consulta.idUnidade,consulta.idPaciente, consulta.dataConsulta])
+
+    //fechar conexao banco
+    await db.end()
+    
+
+  // avisar barramento
     await axios.post("http://localhost:7000/eventos", {
     tipo: "ConsultaAgendada",
     dados: {
@@ -104,6 +112,7 @@ app.post('/consulta/agendar', async (req, res) => {
     res.status(201).send(`Consulta para o dia ${consulta.dataConsulta} agendada com sucesso!`)
 
 })
+
 
 
 app.listen(6000, () => { console.log("Consultas. Porta 6000") })

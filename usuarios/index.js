@@ -43,7 +43,6 @@ app.post('/cadastro/paciente',async (req, res) => {
             return res.send("CPF já cadastrado.")
         }
     })   
-
    
     
     idUsuario++
@@ -66,18 +65,25 @@ app.post('/cadastro/paciente',async (req, res) => {
 
 //endpoint para logar um usuario
 //localhost:5000/login
-app.post('/login', (req, res) => {
+app.post('/login', async(req, res) => {
 
-    const cpf = req.body.cpf
-    const senha = req.body.senha
-    usuarios.forEach(usuario => {
-        console.log(usuario)
-        if (cpf === usuario.cpf && senha === usuario.senha) {
+    let db = obterConexaoDB()
+    await db.connect()
+
+    const cpfReq = req.body.cpf
+    const senhaReq = req.body.senha
+
+    const sqlQuery = "SELECT * FROM tb_pacientes WHERE pac_cpf = $1 AND pac_senha = $2"
+    const {rows} = await db.query(sqlQuery, [cpfReq, senhaReq])
+    usuario = rows[0]
+    if(usuario === undefined){
+        res.send("Usuário e/ou senha incorreta.")
+    }else{
+        if (cpfReq === usuario.pac_cpf && senhaReq === usuario.pac_senha) {
             return res.send("Login efetuado com sucesso!")
         }
-    })
-    res.send("Usuário e/ou senha incorreta.")
-
+    }    
+    db.end()  
 })
 
 app.listen(5000, () => { console.log("Usuários. Porta 5000") })

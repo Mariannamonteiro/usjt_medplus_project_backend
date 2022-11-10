@@ -24,11 +24,6 @@ const {
         });
       }
 
-
-
-const usuarios = []
-let idUsuario = 0
-
 //endpoint para cadastrar um novo usuario paciente
 //localhost:5000/cadastro/paciente
 app.post('/cadastro/paciente',async (req, res) => {

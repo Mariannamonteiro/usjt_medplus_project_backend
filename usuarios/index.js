@@ -35,32 +35,27 @@ app.post('/cadastro/paciente',async (req, res) => {
 
     let db = obterConexaoDB()
     db.connect()
-    const { pacientes } = await db.query
-    ("SELECT * FROM TB_PACIENTES")
-    pacientes.forEach(paciente =>{
 
+    sqlQuerySelect = "SELECT * FROM tb_pacientes WHERE pac_cpf = $1"
+    const {rows} = await db.query(sqlQuerySelect, [req.body.cpf])
+
+    if(rows.length > 0){
         if(paciente.cpf === req.body.cpf){
+            db.end()
             return res.send("CPF já cadastrado.")
         }
-    })   
-   
-    
-    idUsuario++
-    const usuario = req.body
-    usuarios.push({
-        id: idUsuario,
-        nome: usuario.nome,
-        cpf: usuario.cpf,
-        dataNascimento: usuario.dataNascimento,
-        sexo: usuario.sexo,
-        celular: usuario.celular,
-        email: usuario.email,
-        senha: usuario.senha
-    })
+    }else{
+        
+        paciente = req.body
+        sqlQueryInsert = "INSERT INTO TB_PACIENTES (PAC_CPF,PAC_NOME,PAC_DTNASCIMENTO,PAC_SEXO,PAC_TELEFONE,PAC_EMAIL,PAC_SENHA)" 
+         + "VALUES($1, $2, $3, $4, $5, $6, $7)"
+        
+        await db.query(sqlQueryInsert, [paciente.cpf, paciente.nome, paciente.dataNascimento, paciente.sexo,paciente.celular, paciente.email, paciente.senha ]) 
 
-    console.log(usuarios)
-    res.status(201).send(`Paciente ${usuario.nome} criado com sucesso!`)
+        db.end()
+        res.status(201).send(`Paciente ${paciente.nome} criado com sucesso!`)
 
+    }
 })
 
 //endpoint para logar um usuario

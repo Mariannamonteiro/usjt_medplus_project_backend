@@ -40,7 +40,7 @@ app.post('/envio-de-email', (req, res) => {
             Dia: ${consulta.dataConsulta} <br>
             Unidade: ${consulta.idUnidade}  <br>
             <br>
-            Para efetivar se cadastro na MEDPLUS, atualize a senha padrão que criamos nesse link:<a href="https://www.google.com/">Redefina sua senha MEDPLUS</a>.
+            Para efetivar se cadastro na MEDPLUS, atualize a senha padrão que criamos nesse link:<a href="https://www.google.com/${consulta.cpf}">Redefina sua senha MEDPLUS</a>.
             <br>
             Lembramos que, para consultas em nossas unidades, a apresentação do documento de identificação e da carteirinha do convênio*, são indispensáveis. Bem como o uso de máscara, em função da pandemia da COVID-19
             `

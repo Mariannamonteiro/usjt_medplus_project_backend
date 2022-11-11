@@ -109,6 +109,23 @@ app.get('/buscar/usuario/:cpf', async (req, res) => {
   }
 });
 
+
+
+//atualizar senha do usuario
+//localhost:5000/redefinir/senha/usuario
+app.put('/redefinir/senha/usuario/:cpfUser', async (req, res) => {
+    let db = obterConexaoDB();
+    await db.connect();
+    const cpfUser = parseInt(req.params.cpfUser);
+    const senhaAtualizada = req.body.senha;
+  
+    const sqlQueryUpdate = 'UPDATE tb_pacientes SET pac_senha = $1 where pac_cpf= $2';
+    await db.query(sqlQueryUpdate, [senhaAtualizada, cpfUser]);
+    db.end();
+    res.send('Senha atualizada com sucesso!');
+});
+
+
 app.listen(5000, () => {
   console.log('Usuários. Porta 5000');
 });

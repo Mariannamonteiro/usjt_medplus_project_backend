@@ -90,12 +90,14 @@ app.delete('/consulta/cancelar/:idConsulta', (req, res)=>{
 //endpoint para marcar uma nova consulta 
 //localhost:6000/consulta/agendar
 app.post('/consulta/agendar', async (req, res) => {
-    //abrir conexao com o banco 
     let db = obterConexaoDB()
     await db.connect()
     const consulta = req.body
-    const sqlQuery = "INSERT INTO TB_CONSULTAS (CONS_IDESPECIALIDADE, CONS_IDUNIDADE, CONS_IDPACIENTE, CONS_DTHR) VALUES ($1,$2,$3,$4)"
-    db.query(sqlQuery, [consulta.idEspecialidade, consulta.idUnidade,consulta.idPaciente, consulta.dataConsulta])
+
+    if(consulta.usuarioLogado === true){
+
+    const sqlQueryInsert = "INSERT INTO TB_CONSULTAS (CONS_IDESPECIALIDADE, CONS_IDUNIDADE, CONS_IDPACIENTE, CONS_DTHR) VALUES ($1,$2,$3,$4)"
+    await db.query(sqlQueryInsert, [consulta.idEspecialidade, consulta.idUnidade,consulta.idPaciente, consulta.dataConsulta])
 
     await db.end()   
     await axios.post("http://localhost:7000/eventos", {
@@ -103,9 +105,63 @@ app.post('/consulta/agendar', async (req, res) => {
     dados: {
         consulta
     }
-  });
-
+    });
     res.status(201).send(`Consulta para o dia ${consulta.dataConsulta} agendada com sucesso!`)
+
+    }else{
+        //usuario não está logado
+        let dadosUsuario = req.body
+        console.log(dadosUsuario)
+        //buscar pessoa na base de usuarios(verificar se existe)
+        const {resultado} =  await axios.post("http://localhost:7000/eventos", {
+        tipo: "BuscarUsuario",
+        dados: {
+            dadosUsuario
+        }
+        });
+            
+        if(resultado.length === 0){
+            //criar novo id para usuario com senha padrao e inseri-lo 
+            dadosUsuario.senha = "123456"
+            await axios.post("http://localhost:7000/eventos", {
+            tipo: "CriarNovoUsuario",
+            dados: {
+            dadosUsuario
+            }
+            });
+            
+            const {resultado} = await axios.post("http://localhost:7000/eventos", {
+             tipo: "BuscarUsuario",
+                dados: {
+            dadosUsuario
+            }
+            });
+            novoUser = resultado
+            console.log("NOVO USER")
+            console.log(novoUser)
+            const sqlQueryInsert = "INSERT INTO TB_CONSULTAS (CONS_IDESPECIALIDADE, CONS_IDUNIDADE, CONS_IDPACIENTE, CONS_DTHR) VALUES ($1,$2,$3,$4)"
+            await db.query(sqlQueryInsert, [consulta.idEspecialidade, consulta.idUnidade,novoUser.idPaciente, consulta.dataConsulta])
+        
+            await db.end()   
+            await axios.post("http://localhost:7000/eventos", {
+            tipo: "ConsultaAgendada",
+            dados: {
+                consulta
+            }
+            });
+        }else{
+            //usuario ja cadastrado
+        }
+
+
+
+    }
+
+
+    
+
+    
+    
 
 })
 

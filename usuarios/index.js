@@ -30,9 +30,12 @@ const {
 //localhost:5000/cadastro/paciente
 app.post('/cadastro/paciente',async (req, res) => {
 
+    if(req.body.barramento === true){
+        req.body = req.body.dados
+    }
     let db = obterConexaoDB()
     db.connect()
-
+    
     sqlQuerySelect = "SELECT * FROM tb_pacientes WHERE pac_cpf = $1"
     const {rows} = await db.query(sqlQuerySelect, [req.body.cpf])
 
@@ -69,14 +72,44 @@ app.post('/login', async(req, res) => {
     const {rows} = await db.query(sqlQuery, [cpfReq, senhaReq])
     usuario = rows[0]
     if(usuario === undefined){
+        db.end() 
         res.send("Usuário e/ou senha incorreta.")
     }else{
         if (cpfReq === usuario.pac_cpf && senhaReq === usuario.pac_senha) {
-            return res.send("Login efetuado com sucesso!")
+
+            sqlQuerySelect = "SELECT * FROM tb_pacientes WHERE pac_cpf = $1"
+            const {rows} = await db.query(sqlQuerySelect, [cpfReq])
+            usuarioLogado = rows[0]
+            db.end() 
+            return res.send(usuarioLogado)
         }
     }    
     db.end()  
+});
+
+//Buscar se user existe
+//localhost:5000/buscar/usuario
+app.get('/buscar/usuario', async (req, res)=> {
+
+    let db = obterConexaoDB()
+    db.connect()
+    console.log("BODY ORIGINAL")
+    console.log(req.body)    
+
+    sqlQuerySelect = "SELECT * FROM tb_pacientes WHERE pac_cpf = $1";
+    const { rows } = await db.query(sqlQuerySelect, [req.body.cpfUser])
+    await db.end()
+
+    console.log("CPF REQ::" + req.cpfUser)
+    console.log("ESTA RETORNANDO?")
+    console.log(rows[0])
+    res.json({resultado: rows.length === 0 ? [] : rows[0]});
 })
+
+
+
+
+
 
 app.listen(5000, () => { console.log("Usuários. Porta 5000") })
 

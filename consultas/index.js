@@ -37,7 +37,7 @@ app.get('/consulta/:idConsulta', async (req, res) => {
 });
 
 //Endpoint para reagendar dados de uma consulta
-//localhost:6000/consulta/reagendamento/:idConsulta
+//localhost:8000/consulta/reagendamento/:idConsulta
 app.put('/consulta/reagendamento/:idConsulta', async (req, res) => {
   let db = obterConexaoDB();
   await db.connect();
@@ -51,7 +51,7 @@ app.put('/consulta/reagendamento/:idConsulta', async (req, res) => {
 });
 
 //endpoint para listar todas as consultas
-//localhost:6000/consultas
+//localhost:8000/consultas
 app.get('/consultas', async (req, res) => {
   let db = obterConexaoDB();
   db.connect();
@@ -61,7 +61,7 @@ app.get('/consultas', async (req, res) => {
 });
 
 //endpoint para cancelar consulta
-//localhost:6000/consultas/cancelar/:idConsulta
+//localhost:8000/consultas/cancelar/:idConsulta
 app.delete('/consulta/cancelar/:idConsulta', (req, res) => {
   const idConsultaReq = parseInt(req.params.idConsulta);
   const consultaAtualizada = req.body;
@@ -74,7 +74,7 @@ app.delete('/consulta/cancelar/:idConsulta', (req, res) => {
 });
 
 //endpoint para marcar uma nova consulta
-//localhost:6000/consulta/agendar
+//localhost:8000/consulta/agendar
 app.post('/consulta/agendar', async (req, res) => {
   let db = obterConexaoDB();
   await db.connect();
@@ -153,6 +153,6 @@ app.post('/consulta/agendar', async (req, res) => {
   }
 });
 
-app.listen(6000, () => {
-  console.log('Consultas. Porta 6000');
+app.listen(8000, () => {
+  console.log('Consultas. Porta 8000');
 });

@@ -70,7 +70,7 @@ app.post('/consultas/usuario', async (req, res) => {
 
   const idReq= req.body.id;
 
-  const sqlQuery = 'SELECT cons_id,cons_idespecialidade,cons_idunidade,cons_idpaciente,cons_dthr,esp_id,esp_especialidade FROM tb_consultas INNER JOIN tb_especialidades ON cons_idespecialidade = esp_id WHERE cons_idpaciente = $1';
+  const sqlQuery = 'SELECT cons_id,cons_idespecialidade,cons_idunidade,cons_idpaciente,cons_dthr,esp_id,esp_especialidade,und_id,und_endereco,und_unidade FROM tb_consultas INNER JOIN tb_especialidades ON cons_idespecialidade = esp_id INNER JOIN tb_unidades ON cons_idunidade = und_id WHERE cons_idpaciente = $1';
   const { rows } = await db.query(sqlQuery, [idReq]);
   await db.end();
   res.json(rows);

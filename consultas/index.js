@@ -60,17 +60,38 @@ app.get('/consultas', async (req, res) => {
   res.json(rows);
 });
 
+//endpoint para listar todas as consultas de um usuario
+//localhost:8080/consultas/usuario
+app.post('/consultas/usuario', async (req, res) => {
+  
+  //conecta com o banco
+  let db = obterConexaoDB();
+  db.connect();
+
+  const idReq= req.body.id;
+
+  const sqlQuery = 'SELECT cons_id,cons_idespecialidade,cons_idunidade,cons_idpaciente,cons_dthr,esp_id,esp_especialidade FROM tb_consultas INNER JOIN tb_especialidades ON cons_idespecialidade = esp_id WHERE cons_idpaciente = $1';
+  const { rows } = await db.query(sqlQuery, [idReq]);
+  await db.end();
+  res.json(rows);
+});
+
 //endpoint para cancelar consulta
 //localhost:8080/consultas/cancelar/:idConsulta
-app.delete('/consulta/cancelar/:idConsulta', (req, res) => {
+app.delete('/consulta/cancelar/:idConsulta', async (req, res) => {
+  //conecta com o banco
+  let db = obterConexaoDB();
+  db.connect();
+
+  //inicializando variavel que recebe o id
   const idConsultaReq = parseInt(req.params.idConsulta);
-  const consultaAtualizada = req.body;
-  consultas.forEach((c) => {
-    if (c.idConsulta === idConsultaReq) {
-      c.status = consultaAtualizada.status;
-      res.status(201).send(`Consulta Cancelada`);
-    }
-  });
+
+  //query do banco
+  const sqlQuery = 'DELETE FROM tb_consultas where cons_id = $1';
+  
+  //Envia query para o banco e aguarda conclusão
+  await db.query(sqlQuery, [idConsultaReq]);
+  await db.end();
 });
 
 //endpoint para marcar uma nova consulta

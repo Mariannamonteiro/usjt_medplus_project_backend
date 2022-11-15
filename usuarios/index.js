@@ -118,11 +118,17 @@ app.put('/redefinir/senha/usuario/:cpfUser', async (req, res) => {
     await db.connect();
     const cpfUser = parseInt(req.params.cpfUser);
     const senhaAtualizada = req.body.senha;
-  
+    sqlQuerySelect = 'SELECT * FROM tb_pacientes WHERE pac_cpf = $1';
+    const { rows } = await db.query(sqlQuerySelect, [cpfUser]);
+    if(rows.length > 0){
     const sqlQueryUpdate = 'UPDATE tb_pacientes SET pac_senha = $1 where pac_cpf= $2';
-    await db.query(sqlQueryUpdate, [senhaAtualizada, cpfUser]);
+     await db.query(sqlQueryUpdate, [senhaAtualizada, cpfUser]);
     db.end();
-    res.send('Senha atualizada com sucesso!');
+    res.status(201).send()
+    }else{
+    res.status(404).send()
+    }
+    
 });
 
 

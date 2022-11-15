@@ -26,7 +26,7 @@ app.get('/consulta/:idConsulta', async (req, res) => {
   await db.connect();
 
   const idConsultaReq = parseInt(req.params.idConsulta);
-  const sqlQuery = 'SELECT * FROM tb_consultas where cons_id = $1';
+  const sqlQuery = 'SELECT cons_id,cons_idespecialidade,cons_idunidade,cons_idpaciente,cons_dthr,esp_id,esp_especialidade,und_id,und_endereco,und_unidade FROM tb_consultas INNER JOIN tb_especialidades ON cons_idespecialidade = esp_id INNER JOIN tb_unidades ON cons_idunidade = und_id WHERE cons_id = $1';
   const { rows } = await db.query(sqlQuery, [idConsultaReq]);
   db.end();
   if (rows.length === 0) {
@@ -43,6 +43,8 @@ app.put('/consulta/reagendamento/:idConsulta', async (req, res) => {
   await db.connect();
   const idConsultaReq = parseInt(req.params.idConsulta);
   const consultaAtualizada = req.body;
+
+  console.log(req.body)
 
   const sqlQuery = 'UPDATE tb_consultas SET cons_dthr = $1, CONS_IDUNIDADE = $2 where cons_id = $3';
   await db.query(sqlQuery, [consultaAtualizada.dataConsulta, consultaAtualizada.idUnidade, idConsultaReq]);

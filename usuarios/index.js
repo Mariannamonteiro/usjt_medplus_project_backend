@@ -116,7 +116,7 @@ app.get('/buscar/usuario/:cpf', async (req, res) => {
 app.put('/redefinir/senha/usuario/:cpfUser', async (req, res) => {
     let db = obterConexaoDB();
     await db.connect();
-    const cpfUser = parseInt(req.params.cpfUser);
+    const cpfUser = req.params.cpfUser;
     const senhaAtualizada = req.body.senha;
     sqlQuerySelect = 'SELECT * FROM tb_pacientes WHERE pac_cpf = $1';
     const { rows } = await db.query(sqlQuerySelect, [cpfUser]);

@@ -38,7 +38,7 @@ app.post('/envio-de-email', (req, res) => {
             subject: "MEDPLUS - Consulta Agendada",
             html: `Olá ${consulta.nome}, <br> sua consulta foi marcada com sucesso na MEDPLUS, confira: <br>
             Dia: ${consulta.dataConsulta} <br>
-            Unidade: ${consulta.idUnidade}  <br>
+            Unidade: ${consulta.nomeUnidade}  <br>
             <br>
             Para efetivar se cadastro na MEDPLUS, atualize a senha padrão que criamos nesse link:<a href="http://localhost:4200/senha/${consulta.cpf}">Redefina sua senha MEDPLUS</a>.
             <br>
@@ -61,7 +61,7 @@ app.post('/envio-de-email', (req, res) => {
             subject: "MEDPLUS - Consulta Agendada",
             html: `Olá ${consulta.nome}, <br> sua consulta foi marcada com sucesso na MEDPLUS, confira: <br>
             Dia: ${consulta.dataConsulta} <br>
-            Unidade: ${consulta.idUnidade}  <br>
+            Unidade: ${consulta.nomeUnidade}  <br>
             Lembramos que, para consultas em nossas unidades, a apresentação do documento de identificação e da carteirinha do convênio*, são indispensáveis. Bem como o uso de máscara, em função da pandemia da COVID-19
             `
         }).then(message =>{

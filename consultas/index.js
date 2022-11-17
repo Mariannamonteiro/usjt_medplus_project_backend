@@ -107,6 +107,9 @@ app.post('/consulta/agendar', async (req, res) => {
     const sqlQueryInsert = 'INSERT INTO TB_CONSULTAS (CONS_IDESPECIALIDADE, CONS_IDUNIDADE, CONS_IDPACIENTE, CONS_DTHR) VALUES ($1,$2,$3,$4)';
     await db.query(sqlQueryInsert, [consulta.idEspecialidade, consulta.idUnidade, consulta.idPaciente, consulta.dataConsulta]);
 
+    const sqlQueryBuscaUnidade = 'SELECT * FROM tb_unidades WHERE und_id = $1'
+    const {rows} = await db.query(sqlQueryBuscaUnidade, [consulta.idUnidade])
+    consulta.nomeUnidade = rows[0]['und_unidade']
     await db.end();
     await axios.post('http://localhost:7000/eventos', {
       tipo: 'ConsultaAgendadaEnvioEmail',
@@ -145,6 +148,9 @@ app.post('/consulta/agendar', async (req, res) => {
       console.log(novoUsuario);      
       const sqlQueryInsert = 'INSERT INTO TB_CONSULTAS (CONS_IDESPECIALIDADE, CONS_IDUNIDADE, CONS_IDPACIENTE, CONS_DTHR) VALUES ($1,$2,$3,$4)';
       await db.query(sqlQueryInsert, [consulta.idEspecialidade, consulta.idUnidade, novoUsuario.data.novoUsuario.pac_id, consulta.dataConsulta]);
+      const sqlQueryBuscaUnidade = 'SELECT * FROM tb_unidades WHERE und_id = $1'
+      const {rows} = await db.query(sqlQueryBuscaUnidade, [consulta.idUnidade])
+      consulta.nomeUnidade = rows[0]['und_unidade']
 
       await db.end();
       await axios.post('http://localhost:7000/eventos', {
